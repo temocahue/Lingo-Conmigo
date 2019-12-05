@@ -57,11 +57,6 @@ router.post('/login', async (req, res, next) => {
     next(err)
   }
 })
-        //1. if we find user check password 
-        // 2. if password matches wt db set session and send user
-        // object omit pw
-        // 
-
 
 router.post('/register', (req, res, next) => {
   console.log("this is req in register");
@@ -110,18 +105,18 @@ router.post('/register', (req, res, next) => {
             message: 'Signed up'
         });
     });
-}); // end of sign up endpoint
+}); 
+// end of sign up endpoint
 // stores regitered user into db
 
 // // profile route
-// router.get('/profile', async (req, res, next) => {
+router.get('/profile', async (req, res, next) => {
+  const findUser = await User.findById(req.session.userId);
+  const removePwFromUser = findUser.password = undefined
+  res.json(findUser)
+  
+})
 
-// })
-// // amigo list page
-
-// router.post('/findAmigos', async (req, res, next) => {
-
-// })
 router.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if(err){
@@ -141,20 +136,18 @@ router.get('/findAmigos', async (req, res) => {
   const findUser = await User.findById(req.session.userId);
   
   const language = findUser.languageOfInterest
-  const findAllUsersByLanguage = await User.find().where({nativeLanguage: language})
+  const matchingUsers = await User.find().where({nativeLanguage: language})
 
-  res.json(findAllUsersByLanguage)
+  for(let i = 0; i < matchingUsers.length; i++) {
+    const removePwFromUser = matchingUsers[i].password = undefined
+  }  
+  res.json(matchingUsers)
 
 })
 
 
-
-// 1. find cuurent user by id ,
-    // match the current users my langauge of interest to users native language.
-    // response suers that match native langauage.
-
 // // route spanish page
-router.get('/learnSpanish', (req, res, next) => {
+router.get('/learnSpanish', (req, res) => {
 
   
 })
