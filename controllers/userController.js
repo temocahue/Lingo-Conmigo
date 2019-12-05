@@ -23,8 +23,9 @@ router.post('/login', async (req, res, next) => {
     if (foundUser) {
       if (bcrypt.compareSync(req.body.password, foundUser.password)) {
         req.session.message = '';
-        req.session.username = foundUser.username;
+        req.session.userId = foundUser.id;
         req.session.logged = true;
+        console.log(foundUser);
         console.log('password correct');
         res.send({
           success: true,
@@ -117,17 +118,46 @@ router.post('/register', (req, res, next) => {
 
 // })
 // // amigo list page
-// router.get('/findAmigos', async (req, res, next) => {
+
+// router.post('/findAmigos', async (req, res, next) => {
 
 // })
+router.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if(err){
+      return
+      res.send(err);
+    } else {
+        return res.send({
+          success: true,
+          message: 'Good'
+      });
+    }
+  })
+
+})
 // // get users for amigo list
-// router.get('/findAmigos/:id', async (req, res, next) => {
-
-// })
-// // route spanish page
-// router.get('/learnSpanish', async (req, res, next) => {
+router.get('/findAmigos', async (req, res) => {
+  const findUser = await User.findById(req.session.userId);
   
-// })
+  const language = findUser.languageOfInterest
+  const findAllUsersByLanguage = await User.find().where({nativeLanguage: language})
+
+  res.json(findAllUsersByLanguage)
+
+})
+
+
+
+// 1. find cuurent user by id ,
+    // match the current users my langauge of interest to users native language.
+    // response suers that match native langauage.
+
+// // route spanish page
+router.get('/learnSpanish', (req, res, next) => {
+
+  
+})
 
 module.exports = router;
 
