@@ -158,21 +158,14 @@ router.get('/search', async (req, res) => {
     const translation =
     {
       hw:data[0].hwi.hw,
-      // t: data[0].def[0].sseq[0][0][1].dt[1][1][0].t,
-      // tr: data[0].def[0].sseq[0][0][1].dt[1][1][0].tr
       shortdef: data[0].shortdef
     }
-
-
-
     res.send(translation) 
-    // res.send(data[0].hwi.hw) 
   } catch (err) {
     console.error(err);
   }
- 
-
 });
+
 module.exports = router;
 
 
