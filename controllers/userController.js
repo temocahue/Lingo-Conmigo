@@ -3,6 +3,8 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
+const dotenv = require('dotenv').config()
+const superagent = require('superagent');
 
 // login
 router.post('/login', async (req, res, next) => {
@@ -142,16 +144,35 @@ router.get('/findAmigos', async (req, res) => {
     const removePwFromUser = matchingUsers[i].password = undefined
   }  
   res.json(matchingUsers)
-
 })
+//get search
 
 
 // // route spanish page
-router.get('/learnSpanish', (req, res) => {
+router.get('/search', async (req, res) => {
+  try {
+    const url = 'https://dictionaryapi.com/api/v3/references/spanish/json/' + req.body.search + '?key='+ process.env.API_KEY
+    const response = await superagent.get(url);
+    const data = JSON.parse(response.text)
+    console.log(data);
+    const translation =
+    {
+      hw:data[0].hwi.hw,
+      // t: data[0].def[0].sseq[0][0][1].dt[1][1][0].t,
+      // tr: data[0].def[0].sseq[0][0][1].dt[1][1][0].tr
+      shortdef: data[0].shortdef
+    }
 
-  
-})
 
+
+    res.send(translation) 
+    // res.send(data[0].hwi.hw) 
+  } catch (err) {
+    console.error(err);
+  }
+ 
+
+});
 module.exports = router;
 
 
