@@ -3,11 +3,21 @@ const Schema = mongoose.Schema;
 
 
 const messageSchema = new Schema({
-  messageText : String,
-  sender : Number, // ref ObjectId -- Unit 2 -- references
-  receiver: Number, // ref ObjectId -- Unit 2 -- references
-  timestamp : Date, // default date now
+	messageText : String,
+	sender: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: `User`
+	},
+	receiver:{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: `User`
+	},
+	date: {
+		type: Date,
+    	default: Date.now()
+  	}
 });
+
 const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;

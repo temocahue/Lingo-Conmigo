@@ -11,7 +11,9 @@ const cors = require('cors')
 //Databadse
 require(`./db/db.js`)
 
-app.use(cors())
+app.use(cors({
+	origin: 'http://localhost:3000'
+}))
 app.use(express.static('public'))
 	//body parser
 app.use(bodyParser.urlencoded({extended: false}))
@@ -29,6 +31,8 @@ const PORT = process.env.PORT
 // Controllers
 const userController = require('./controllers/userController.js');
 app.use('/users', userController)
+const messageController = require('./controllers/messageController.js');
+app.use('/messages', messageController)
 
 app.listen(PORT, () => {
 	console.log('listening');
