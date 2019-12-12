@@ -29,9 +29,11 @@ router.post('/login', async (req, res, next) => {
         req.session.logged = true;
         console.log(foundUser);
         console.log('password correct');
+        foundUser.password = undefined
         res.send({
           success: true,
-          message: 'Valid sign in'
+          message: 'Valid sign in',
+          user: foundUser
 
         })
       }
@@ -61,8 +63,7 @@ router.post('/login', async (req, res, next) => {
 })
 
 router.post('/register', (req, res, next) => {
-  console.log("this is req in register");
-  console.log(req);
+  console.log(req.body)
     if (!req.body.username) {
         return res.send({
             success: false,
@@ -102,9 +103,12 @@ router.post('/register', (req, res, next) => {
         }
         const newUser = User.create(userToCreate)
         console.log(newUser);
+        console.log('\nhitting route');
+        userToCreate.password = undefined
         return res.send({
             success: true,
-            message: 'Signed up'
+            message: 'Signed up',
+            user: userToCreate
         });
     });
 }); 
@@ -113,11 +117,15 @@ router.post('/register', (req, res, next) => {
 
 // // profile route
 router.get('/profile', async (req, res, next) => {
+  try{
   const findUser = await User.findById(req.session.userId);
   const removePwFromUser = findUser.password = undefined
   res.json(findUser)
-  
+  } catch(err){
+    console.log(findUser);
+  }
 })
+
 
 router.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -136,16 +144,39 @@ router.get('/logout', (req, res) => {
 // // get users for amigo list
 router.get('/findAmigos', async (req, res) => {
   const findUser = await User.findById(req.session.userId);
+
+  console.log("this is findUser in /findAmigos")
+  console.log(findUser)
   
   const language = findUser.languageOfInterest
+  console.log(language)
   const matchingUsers = await User.find().where({nativeLanguage: language})
 
   for(let i = 0; i < matchingUsers.length; i++) {
     const removePwFromUser = matchingUsers[i].password = undefined
   }  
+  console.log("this is matchingUsers in findAmigos")
+  console.log(matchingUsers)
   res.json(matchingUsers)
 })
 //get search
+router.delete('/:id', async (req, res) => {
+   try{
+    const deleteAmigo = await User.findByIdAndRemove(req.params.id)
+    res.send({
+      message: deleteAmigo,
+      status:'amigo deleted',
+      success: true
+    })
+  }
+  catch(err){
+    res.send({
+      message:'failed to update',
+      success: false
+    })
+
+  }
+})
 
 
 // // route spanish page
@@ -165,6 +196,23 @@ router.get('/search', async (req, res) => {
     console.error(err);
   }
 });
+router.put('/:id', async (req, res, next) => {
+  try{
+    const updateBio = await User.findByIdAndUpdate(req.params.id, req.body, {new:true});
+    await updateBio.save()
+    res.send({
+      message: updateBio,
+      status:'message updated',
+      success: true
+    })
+  }
+  catch(err){
+    res.send({
+      message:'failed to update',
+      success: false
+    })
+  }
+})
 
 module.exports = router;
 

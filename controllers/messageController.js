@@ -2,15 +2,15 @@
 const express = require('express')
 const router = express.Router()
 const Message = require('../models/message')
+const User = require('../models/user')
 const bcrypt = require('bcryptjs')
 // // message route
-
 // // create meesage
 router.post('/sms', async (req, res) => {
 	try{
 	 	const createdMessage = await Message.create({
 	 		messageText: req.body.messageText,
-	  		sender : req.body.sender,
+	  		sender : req.session.userId,
 	  		receiver: req.body.receiver,
 	  		date: req.body.date	
 	 	})
@@ -29,26 +29,17 @@ router.post('/sms', async (req, res) => {
  		})
  	}
 })
+// get messages
+router.get('/:amigoId', async (req, res) => {
+	console.log("\nme");
+	console.log(req.session.userId);
+	const sentMessages = await Message.find({sender: req.session.userId, receiver: req.params.amigoId});
+	const receivedMessages = await Message.find({sender: req.params.amigoId, receiver: req.session.userId})
+	// _.sortBy(sentMessages, ['date'])
+	console.log("\nabout to respond");
+	res.json({sentMessages: sentMessages, receivedMessages: receivedMessages})
+})
 
-
-// // edit messages route
-// router.get('/:id/edit', async (req, res) => {
-// 	try{
-// 		const foundMessage = await Message.findById(req.params.id)
-// 		res.send({
-// 			message: foundMessage,
-// 			success: true
-// 		})
-// 	}
-// 	catch(err){
-// 		console.log(err)
-//  		res.send({
-//  			message:'failed to edit',
-//  			success: false
-//  		})
-// 	}
-
-// })
 
 // // update route for messages
 router.put('/:id', async (req, res, next) => {

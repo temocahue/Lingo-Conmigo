@@ -12,7 +12,9 @@ const cors = require('cors')
 require(`./db/db.js`)
 
 app.use(cors({
-	origin: 'http://localhost:3000'
+	origin: 'http://localhost:3000',
+	credentials: true,
+	optionsSuccessStatus: 200
 }))
 app.use(express.static('public'))
 	//body parser
